@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"encoding/json"
+	"io"
+)
+
 // User domain model
 type User struct {
 	ID        int    `json:"id"`
@@ -10,4 +15,10 @@ type User struct {
 	CreatedOn string `json:"-"`
 	UpdatedOn string `json:"-"`
 	DeletedOn string `json:"-"`
+}
+
+// FromJSON decodes JSON data
+func (u *User) FromJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(u)
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"main.go/domain"
 	"main.go/repository"
 )
 
@@ -24,6 +25,11 @@ func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.Method == http.MethodPost {
+		u.addUser(rw, r)
+		return
+	}
+
 	// catch all
 	// if no method is satisfied return an error
 	rw.WriteHeader(http.StatusMethodNotAllowed)
@@ -41,4 +47,19 @@ func (u *Users) getUsers(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
 	}
+}
+
+func (u *Users) addUser(rw http.ResponseWriter, r *http.Request) {
+	u.l.Println("Handle POST Product")
+
+	user := &domain.User{}
+
+	err := user.FromJSON(r.Body)
+	if err != nil {
+		http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
+	}
+
+	repository.AddUser(user)
+
+	u.l.Printf("User: %#v", user)
 }

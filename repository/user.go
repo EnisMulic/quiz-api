@@ -39,3 +39,8 @@ func (u *Users) ToJSON(w io.Writer) error {
 func GetUsers() Users {
 	return userList
 }
+
+// AddUser adds a new User
+func AddUser(u *domain.User) {
+	userList = append(userList, u)
+}
