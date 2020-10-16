@@ -7,14 +7,19 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"main.go/handlers"
 )
 
 func main() {
 	// create a logger
 	logger := log.New(os.Stdout, "quiz-api", log.LstdFlags)
 
+	userHandler := handlers.NewUser(logger)
+
 	// create a new serve mux
 	serverMux := http.NewServeMux()
+	serverMux.Handle("/user", userHandler)
 
 	// create the server
 	server := &http.Server{
