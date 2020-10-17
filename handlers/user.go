@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"main.go/domain"
 	"main.go/repository"
 )
@@ -18,25 +21,8 @@ func NewUser(l *log.Logger) *Users {
 	return &Users{l}
 }
 
-func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	// handle the request for a list of products
-	if r.Method == http.MethodGet {
-		u.getUsers(rw, r)
-		return
-	}
-
-	if r.Method == http.MethodPost {
-		u.addUser(rw, r)
-		return
-	}
-
-	// catch all
-	// if no method is satisfied return an error
-	rw.WriteHeader(http.StatusMethodNotAllowed)
-}
-
-// getUsers returns the Users from the data store
-func (u *Users) getUsers(rw http.ResponseWriter, r *http.Request) {
+// GetUsers returns the Users from the data store
+func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle GET Users")
 
 	// fetch the products from the datastore
@@ -49,17 +35,60 @@ func (u *Users) getUsers(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (u *Users) addUser(rw http.ResponseWriter, r *http.Request) {
+// AddUser adds a user to the "db"
+func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle POST Product")
 
-	user := &domain.User{}
-
-	err := user.FromJSON(r.Body)
-	if err != nil {
-		http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
-	}
-
-	repository.AddUser(user)
+	user := r.Context().Value(KeyUser{}).(domain.User)
+	repository.AddUser(&user)
 
 	u.l.Printf("User: %#v", user)
+}
+
+// UpdateUser updates a user
+func (u Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
+		return
+	}
+
+	u.l.Println("Handle PUT User")
+	user := r.Context().Value(KeyUser{}).(domain.User)
+
+	err = repository.UpdateUser(id, &user)
+	if err == repository.ErrUserNotFound {
+		http.Error(rw, "User not found", http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(rw, "User not found", http.StatusInternalServerError)
+		return
+	}
+}
+
+// KeyUser a key
+type KeyUser struct{}
+
+// MiddlewareValidateUser for validation
+func (u Users) MiddlewareValidateUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		user := domain.User{}
+
+		err := user.FromJSON(r.Body)
+		if err != nil {
+			u.l.Println("[ERROR] deserializing product", err)
+			http.Error(rw, "Error reading product", http.StatusBadRequest)
+			return
+		}
+
+		// add the product to the context
+		ctx := context.WithValue(r.Context(), KeyUser{}, user)
+		r = r.WithContext(ctx)
+
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(rw, r)
+	})
 }

@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/mux"
 	"main.go/handlers"
 )
 
@@ -18,8 +19,19 @@ func main() {
 	userHandler := handlers.NewUser(logger)
 
 	// create a new serve mux
-	serverMux := http.NewServeMux()
-	serverMux.Handle("/user", userHandler)
+	serverMux := mux.NewRouter()
+	//serverMux.Handle("/user", userHandler).Methods("GET")
+
+	getRouter := serverMux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/user", userHandler.GetUsers)
+
+	putRouter := serverMux.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.UpdateUser)
+	putRouter.Use(userHandler.MiddlewareValidateUser)
+
+	postRouter := serverMux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/user", userHandler.AddUser)
+	postRouter.Use(userHandler.MiddlewareValidateUser)
 
 	// create the server
 	server := &http.Server{

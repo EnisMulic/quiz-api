@@ -2,6 +2,7 @@ package repository
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 
@@ -43,4 +44,35 @@ func GetUsers() Users {
 // AddUser adds a new User
 func AddUser(u *domain.User) {
 	userList = append(userList, u)
+}
+
+// UpdateUser updates a user
+func UpdateUser(id int, u *domain.User) error {
+	_, pos, err := findUser(id)
+	if err != nil {
+		return err
+	}
+
+	u.ID = id
+	userList[pos] = u
+
+	return nil
+}
+
+// ErrUserNotFound an error
+var ErrUserNotFound = fmt.Errorf("User not found")
+
+func findUser(id int) (*domain.User, int, error) {
+	for i, p := range userList {
+		if p.ID == id {
+			return p, i, nil
+		}
+	}
+
+	return nil, -1, ErrUserNotFound
+}
+
+func getNextID() int {
+	lp := userList[len(userList)-1]
+	return lp.ID + 1
 }
