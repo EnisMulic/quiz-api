@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -81,6 +82,18 @@ func (u Users) MiddlewareValidateUser(next http.Handler) http.Handler {
 		if err != nil {
 			u.l.Println("[ERROR] deserializing product", err)
 			http.Error(rw, "Error reading product", http.StatusBadRequest)
+			return
+		}
+
+		// validate the user
+		err = user.Validate()
+		if err != nil {
+			u.l.Println("[ERROR] validating user", err)
+			http.Error(
+				rw,
+				fmt.Sprintf("Error validating user: %s", err),
+				http.StatusBadRequest,
+			)
 			return
 		}
 
