@@ -1,0 +1,31 @@
+basePath: /
+consumes:
+- application/json
+info:
+  description: |-
+    Documentation for Quiz API
+
+    Schames: http
+  title: of Quiz API
+  version: 1.0.0
+paths:
+  /user:
+    get:
+      description: Returns a list of user
+      operationId: listUser
+      tags:
+      - users
+    post:
+      description: Create a new user
+      operationId: createUser
+      tags:
+      - users
+  /user/{id}:
+    put:
+      description: Update a users details
+      operationId: updateUser
+      tags:
+      - users
+produces:
+- application/json
+swagger: "2.0"

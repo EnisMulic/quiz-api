@@ -1,3 +1,17 @@
+// Package classification of Quiz API
+//
+// Documentation for Quiz API
+//
+//  Schames: http
+//	BasePath: /
+//	Version: 1.0.0
+//
+//	Consumes:
+//	- application/json
+//
+//	Produces:
+//	- application/json
+//	swagger:meta
 package handlers
 
 import (
@@ -12,6 +26,14 @@ import (
 	"main.go/repository"
 )
 
+// // A list of users
+// // swagger:response usersResponse
+// type usersResponse struct {
+// 	// All users in the database
+// 	// in: Body
+// 	Body []domain.User
+// }
+
 // Users struct
 type Users struct {
 	l *log.Logger
@@ -21,6 +43,9 @@ type Users struct {
 func NewUser(l *log.Logger) *Users {
 	return &Users{l}
 }
+
+// swagger:route GET /user users listUser
+// Returns a list of user
 
 // GetUsers returns the Users from the data store
 func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
@@ -36,6 +61,9 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// swagger:route POST /user users createUser
+// Create a new user
+
 // AddUser adds a user to the "db"
 func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle POST Product")
@@ -45,6 +73,9 @@ func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 
 	u.l.Printf("User: %#v", user)
 }
+
+// swagger:route PUT /user/{id} users updateUser
+// Update a users details
 
 // UpdateUser updates a user
 func (u Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
