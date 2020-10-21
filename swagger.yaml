@@ -11,21 +11,30 @@ info:
 paths:
   /user:
     get:
-      description: Returns a list of user
+      description: |-
+        Returns a list of users
+        response:
+        200: UsersResponse
       operationId: listUser
       tags:
-      - users
+      - user
     post:
       description: Create a new user
       operationId: createUser
+      responses:
+        "200":
+          $ref: '#/responses/UserResponse'
       tags:
-      - users
+      - user
   /user/{id}:
     put:
       description: Update a users details
       operationId: updateUser
+      responses:
+        "200":
+          $ref: '#/responses/UserResponse'
       tags:
-      - users
+      - user
 produces:
 - application/json
 swagger: "2.0"

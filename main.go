@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/EnisMulic/quiz-api/handlers"
 	"github.com/go-openapi/runtime/middleware"
 	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"main.go/handlers"
 )
 
 func main() {

@@ -21,18 +21,30 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/EnisMulic/quiz-api/domain"
+	"github.com/EnisMulic/quiz-api/repository"
 	"github.com/gorilla/mux"
-	"main.go/domain"
-	"main.go/repository"
 )
 
-// // A list of users
-// // swagger:response usersResponse
-// type usersResponse struct {
-// 	// All users in the database
-// 	// in: Body
-// 	Body []domain.User
-// }
+// A list of users
+// swagger:response UsersResponse
+
+// UsersResponse dto
+type UsersResponse struct {
+	// All users in the database
+	// in: body
+	Body []domain.User
+}
+
+// A user
+// swagger:response UserResponse
+
+// UserResponse dto
+type UserResponse struct {
+	// A User in the database
+	// in: body
+	Body domain.User
+}
 
 // Users struct
 type Users struct {
@@ -44,8 +56,10 @@ func NewUser(l *log.Logger) *Users {
 	return &Users{l}
 }
 
-// swagger:route GET /user users listUser
-// Returns a list of user
+// swagger:route GET /user user listUser
+// Returns a list of users
+// response:
+//	200: UsersResponse
 
 // GetUsers returns the Users from the data store
 func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
@@ -61,8 +75,10 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// swagger:route POST /user users createUser
+// swagger:route POST /user user createUser
 // Create a new user
+// responses:
+//	200: UserResponse
 
 // AddUser adds a user to the "db"
 func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
@@ -74,8 +90,10 @@ func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 	u.l.Printf("User: %#v", user)
 }
 
-// swagger:route PUT /user/{id} users updateUser
+// swagger:route PUT /user/{id} user updateUser
 // Update a users details
+// responses:
+//	200: UserResponse
 
 // UpdateUser updates a user
 func (u Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {

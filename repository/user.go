@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"main.go/domain"
+	"github.com/EnisMulic/quiz-api/domain"
 )
 
 // example data source
