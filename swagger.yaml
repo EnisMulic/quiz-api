@@ -1,13 +1,4 @@
-basePath: /
-consumes:
-- application/json
-info:
-  description: |-
-    Documentation for Quiz API
-
-    Schames: http
-  title: of Quiz API
-  version: 1.0.0
+info: {}
 paths:
   /quiz:
     get:
@@ -63,6 +54,4 @@ paths:
       operationId: updateUser
       tags:
       - user
-produces:
-- application/json
 swagger: "2.0"
