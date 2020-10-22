@@ -21,6 +21,16 @@ paths:
       tags:
       - user
   /user/{id}:
+    delete:
+      description: Delete a user
+      operationId: deleteUser
+      tags:
+      - user
+    get:
+      description: Returns a single user
+      operationId: singleUser
+      tags:
+      - user
     put:
       description: Update a users details
       operationId: updateUser

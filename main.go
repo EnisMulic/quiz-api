@@ -26,6 +26,7 @@ func main() {
 
 	getRouter := serverMux.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/user", userHandler.GetUsers)
+	getRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.GetUser)
 
 	putRouter := serverMux.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.UpdateUser)
@@ -34,6 +35,9 @@ func main() {
 	postRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/user", userHandler.AddUser)
 	postRouter.Use(userHandler.MiddlewareValidateUser)
+
+	deleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.DeleteUser)
 
 	// handler for documentation
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}

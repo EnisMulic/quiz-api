@@ -73,12 +73,22 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// swagger:route GET /user/{id} user singleUser
+// Returns a single user
+
+// GetUser returns the Users from the data store
+func (u *Users) GetUser(rw http.ResponseWriter, r *http.Request) {
+	u.l.Println("Handle GET User")
+
+	//To Be Implemented
+}
+
 // swagger:route POST /user user createUser
 // Create a new user
 
 // AddUser adds a user to the "db"
 func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
-	u.l.Println("Handle POST Product")
+	u.l.Println("Handle POST User")
 
 	user := r.Context().Value(KeyUser{}).(domain.User)
 	repository.AddUser(&user)
@@ -111,6 +121,14 @@ func (u Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "User not found", http.StatusInternalServerError)
 		return
 	}
+}
+
+// swagger:route DELETE /user/{id} user deleteUser
+// Delete a user
+
+// DeleteUser handles DELETE requests and removes items from the database
+func (u *Users) DeleteUser(rw http.ResponseWriter, r *http.Request) {
+	//To Be Implemented
 }
 
 // KeyUser a key
