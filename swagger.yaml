@@ -11,28 +11,19 @@ info:
 paths:
   /user:
     get:
-      description: |-
-        Returns a list of users
-        response:
-        200: UsersResponse
+      description: Returns a list of users
       operationId: listUser
       tags:
       - user
     post:
       description: Create a new user
       operationId: createUser
-      responses:
-        "200":
-          $ref: '#/responses/UserResponse'
       tags:
       - user
   /user/{id}:
     put:
       description: Update a users details
       operationId: updateUser
-      responses:
-        "200":
-          $ref: '#/responses/UserResponse'
       tags:
       - user
 produces:

@@ -47,7 +47,7 @@ func main() {
 
 	// create the server
 	server := &http.Server{
-		Addr:         ":8080",
+		Addr:         ":9090",
 		Handler:      corsHandler(serverMux),
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,

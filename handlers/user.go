@@ -58,8 +58,6 @@ func NewUser(l *log.Logger) *Users {
 
 // swagger:route GET /user user listUser
 // Returns a list of users
-// response:
-//	200: UsersResponse
 
 // GetUsers returns the Users from the data store
 func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
@@ -77,8 +75,6 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 
 // swagger:route POST /user user createUser
 // Create a new user
-// responses:
-//	200: UserResponse
 
 // AddUser adds a user to the "db"
 func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
@@ -92,8 +88,6 @@ func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 
 // swagger:route PUT /user/{id} user updateUser
 // Update a users details
-// responses:
-//	200: UserResponse
 
 // UpdateUser updates a user
 func (u Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
