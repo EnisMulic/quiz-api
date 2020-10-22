@@ -23,6 +23,15 @@ func (q *Quizes) GetQuizes(rw http.ResponseWriter, r *http.Request) {
 	// ToBe Implemented
 }
 
+// swagger:route GET /quiz/{id} quiz singleQuiz
+// Returns a single quiz
+
+// GetQuiz returns the quiz from the data store
+func (q *Quizes) GetQuiz(rw http.ResponseWriter, r *http.Request) {
+
+	//To Be Implemented
+}
+
 // swagger:route POST /quiz quiz createQuiz
 // Create a new quiz
 
@@ -37,4 +46,12 @@ func (q *Quizes) AddQuiz(rw http.ResponseWriter, r *http.Request) {
 // UpdateQuiz updates a quiz
 func (q *Quizes) UpdateQuiz(rw http.ResponseWriter, r *http.Request) {
 	// ToBe Implemented
+}
+
+// swagger:route DELETE /quiz/{id} quiz deleteQuiz
+// Delete a quiz
+
+// DeleteQuiz handles DELETE requests and removes items from the database
+func (q *Quizes) DeleteQuiz(rw http.ResponseWriter, r *http.Request) {
+	//To Be Implemented
 }

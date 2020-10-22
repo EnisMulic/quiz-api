@@ -9,6 +9,33 @@ info:
   title: of Quiz API
   version: 1.0.0
 paths:
+  /quiz:
+    get:
+      description: Returns a list of quizes
+      operationId: listQuiz
+      tags:
+      - quiz
+    post:
+      description: Create a new quiz
+      operationId: createQuiz
+      tags:
+      - quiz
+  /quiz/{id}:
+    delete:
+      description: Delete a quiz
+      operationId: deleteQuiz
+      tags:
+      - quiz
+    get:
+      description: Returns a single quiz
+      operationId: singleQuiz
+      tags:
+      - quiz
+    put:
+      description: Update a quiz
+      operationId: updateQuiz
+      tags:
+      - quiz
   /user:
     get:
       description: Returns a list of users

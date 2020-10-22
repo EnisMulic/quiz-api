@@ -19,6 +19,7 @@ func main() {
 	logger := log.New(os.Stdout, "quiz-api", log.LstdFlags)
 
 	userHandler := handlers.NewUser(logger)
+	quizHandler := handlers.NewQuiz(logger)
 
 	// create a new serve mux
 	serverMux := mux.NewRouter()
@@ -28,16 +29,25 @@ func main() {
 	getRouter.HandleFunc("/user", userHandler.GetUsers)
 	getRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.GetUser)
 
+	getRouter.HandleFunc("/quiz", quizHandler.GetQuizes)
+	getRouter.HandleFunc("/quiz/{id:[0-9]+}", quizHandler.GetQuiz)
+
 	putRouter := serverMux.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.UpdateUser)
 	putRouter.Use(userHandler.MiddlewareValidateUser)
+
+	putRouter.HandleFunc("/quiz/{id:[0-9]+}", quizHandler.UpdateQuiz)
 
 	postRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/user", userHandler.AddUser)
 	postRouter.Use(userHandler.MiddlewareValidateUser)
 
+	postRouter.HandleFunc("/quiz", quizHandler.AddQuiz)
+
 	deleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.DeleteUser)
+
+	deleteRouter.HandleFunc("/quiz/{id:[0-9]+}", quizHandler.DeleteQuiz)
 
 	// handler for documentation
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
