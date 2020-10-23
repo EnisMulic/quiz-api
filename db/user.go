@@ -5,29 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/EnisMulic/quiz-api/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-// example data source
-var userList = []*domain.User{
-	&domain.User{
-		Username:  "User1",
-		Email:     "user1@email.com",
-		CreatedOn: time.Now().UTC().String(),
-		UpdatedOn: time.Now().UTC().String(),
-	},
-	&domain.User{
-		Username:  "User2",
-		Email:     "user2@email.com",
-		CreatedOn: time.Now().UTC().String(),
-		UpdatedOn: time.Now().UTC().String(),
-	},
-}
 
 var userCollection string = "users"
 
