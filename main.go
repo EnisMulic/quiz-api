@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/EnisMulic/quiz-api/db"
+
 	"github.com/EnisMulic/quiz-api/handlers"
 	"github.com/go-openapi/runtime/middleware"
 	gohandlers "github.com/gorilla/handlers"
@@ -31,7 +33,11 @@ func main() {
 	// create a logger
 	logger := log.New(os.Stdout, "quiz-api", log.LstdFlags)
 
-	userHandler := handlers.NewUser(logger)
+	// create repositories
+	userRepo := db.NewUserRepository(client)
+
+	// create handlers
+	userHandler := handlers.NewUser(logger, userRepo)
 	quizHandler := handlers.NewQuiz(logger)
 
 	// create a new serve mux
@@ -40,16 +46,16 @@ func main() {
 
 	getRouter := serverMux.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/user", userHandler.GetUsers)
-	getRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.GetUser)
+	getRouter.HandleFunc("/user/{id}", userHandler.GetUser)
 
 	getRouter.HandleFunc("/quiz", quizHandler.GetQuizes)
-	getRouter.HandleFunc("/quiz/{id:[0-9]+}", quizHandler.GetQuiz)
+	getRouter.HandleFunc("/quiz/{id}", quizHandler.GetQuiz)
 
 	putRouter := serverMux.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.UpdateUser)
+	putRouter.HandleFunc("/user/{id}", userHandler.UpdateUser)
 	putRouter.Use(userHandler.MiddlewareValidateUser)
 
-	putRouter.HandleFunc("/quiz/{id:[0-9]+}", quizHandler.UpdateQuiz)
+	putRouter.HandleFunc("/quiz/{id}", quizHandler.UpdateQuiz)
 
 	postRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/user", userHandler.AddUser)
@@ -58,9 +64,9 @@ func main() {
 	postRouter.HandleFunc("/quiz", quizHandler.AddQuiz)
 
 	deleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/user/{id:[0-9]+}", userHandler.DeleteUser)
+	deleteRouter.HandleFunc("/user/{id}", userHandler.DeleteUser)
 
-	deleteRouter.HandleFunc("/quiz/{id:[0-9]+}", quizHandler.DeleteQuiz)
+	deleteRouter.HandleFunc("/quiz/{id}", quizHandler.DeleteQuiz)
 
 	// handler for documentation
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}

@@ -2,14 +2,15 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
+	"github.com/EnisMulic/quiz-api/db"
 	"github.com/EnisMulic/quiz-api/domain"
-	"github.com/EnisMulic/quiz-api/repository"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // A list of users
@@ -17,7 +18,7 @@ import (
 
 // UsersResponse dto
 type UsersResponse struct {
-	// All users in the database
+	// All users in the db
 	// in: body
 	Body []domain.User
 }
@@ -27,7 +28,7 @@ type UsersResponse struct {
 
 // UserResponse dto
 type UserResponse struct {
-	// A User in the database
+	// A User in the db
 	// in: body
 	Body domain.User
 }
@@ -35,11 +36,12 @@ type UserResponse struct {
 // Users struct
 type Users struct {
 	l *log.Logger
+	r *db.UserRepository
 }
 
 // NewUser func
-func NewUser(l *log.Logger) *Users {
-	return &Users{l}
+func NewUser(l *log.Logger, r *db.UserRepository) *Users {
+	return &Users{l, r}
 }
 
 // swagger:route GET /user user listUser
@@ -50,7 +52,8 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle GET Users")
 
 	// fetch the products from the datastore
-	list := repository.GetUsers()
+
+	list := u.r.GetUsers()
 
 	// serialize the list to JSON
 	err := list.ToJSON(rw)
@@ -66,7 +69,20 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 func (u *Users) GetUser(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle GET User")
 
-	//To Be Implemented
+	vars := mux.Vars(r)
+	id, err := primitive.ObjectIDFromHex(vars["id"])
+	if err != nil {
+		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
+		return
+	}
+
+	user := u.r.GetUser(id)
+
+	// serialize the list to JSON
+	err = user.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
+	}
 }
 
 // swagger:route POST /user user createUser
@@ -77,7 +93,7 @@ func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle POST User")
 
 	user := r.Context().Value(KeyUser{}).(domain.User)
-	repository.AddUser(&user)
+	u.r.AddUser(&user)
 
 	u.l.Printf("User: %#v", user)
 }
@@ -86,19 +102,25 @@ func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 // Update a users details
 
 // UpdateUser updates a user
-func (u Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
+func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+	id, err := primitive.ObjectIDFromHex(vars["id"])
 	if err != nil {
 		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
 		return
 	}
 
-	u.l.Println("Handle PUT User")
-	user := r.Context().Value(KeyUser{}).(domain.User)
+	var updateData map[string]interface{}
+	err = json.NewDecoder(r.Body).Decode(&updateData)
+	if err != nil {
+		http.Error(rw, "json body is incorrect", http.StatusBadRequest)
+		return
+	}
 
-	err = repository.UpdateUser(id, &user)
-	if err == repository.ErrUserNotFound {
+	u.l.Println("Handle PUT User")
+
+	err = u.r.UpdateUser(id, updateData)
+	if err == db.ErrUserNotFound {
 		http.Error(rw, "User not found", http.StatusNotFound)
 		return
 	}
@@ -112,7 +134,7 @@ func (u Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 // swagger:route DELETE /user/{id} user deleteUser
 // Delete a user
 
-// DeleteUser handles DELETE requests and removes items from the database
+// DeleteUser handles DELETE requests and removes items from the db
 func (u *Users) DeleteUser(rw http.ResponseWriter, r *http.Request) {
 	//To Be Implemented
 }
