@@ -12,9 +12,22 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
+	// setup mongodb connection
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, connErr := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+
+	defer func() {
+		if connErr = client.Disconnect(ctx); connErr != nil {
+			panic(connErr)
+		}
+	}()
+
 	// create a logger
 	logger := log.New(os.Stdout, "quiz-api", log.LstdFlags)
 
