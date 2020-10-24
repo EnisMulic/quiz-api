@@ -103,6 +103,8 @@ func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 
 // UpdateUser updates a user
 func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
+	u.l.Println("Handle PUT User")
+
 	vars := mux.Vars(r)
 	id, err := primitive.ObjectIDFromHex(vars["id"])
 	if err != nil {
@@ -116,8 +118,6 @@ func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "json body is incorrect", http.StatusBadRequest)
 		return
 	}
-
-	u.l.Println("Handle PUT User")
 
 	err = u.r.UpdateUser(id, updateData)
 	if err == db.ErrUserNotFound {
@@ -136,7 +136,23 @@ func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 
 // DeleteUser handles DELETE requests and removes items from the db
 func (u *Users) DeleteUser(rw http.ResponseWriter, r *http.Request) {
-	//To Be Implemented
+	vars := mux.Vars(r)
+	id, err := primitive.ObjectIDFromHex(vars["id"])
+	if err != nil {
+		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
+		return
+	}
+
+	err = u.r.DeleteUser(id)
+	if err == db.ErrUserNotFound {
+		http.Error(rw, "User not found", http.StatusNotFound)
+		return
+	}
+
+	if err != nil {
+		http.Error(rw, "User not found", http.StatusInternalServerError)
+		return
+	}
 }
 
 // KeyUser a key

@@ -99,6 +99,21 @@ func (ur *UserRepository) UpdateUser(id primitive.ObjectID, data map[string]inte
 }
 
 // DeleteUser removes a user from the database
+func (ur *UserRepository) DeleteUser(id primitive.ObjectID) error {
+	collection := ur.c.Database("quiz-app").Collection(userCollection)
+
+	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": id})
+
+	if result.DeletedCount != 1 {
+		return ErrUserNotFound
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // ErrUserNotFound an error
 var ErrUserNotFound = fmt.Errorf("User not found")
