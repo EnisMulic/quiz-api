@@ -35,10 +35,11 @@ func main() {
 
 	// create repositories
 	userRepo := db.NewUserRepository(client)
+	quizRepo := db.NewQuizRepository(client)
 
 	// create handlers
 	userHandler := handlers.NewUser(logger, userRepo)
-	quizHandler := handlers.NewQuiz(logger)
+	quizHandler := handlers.NewQuiz(logger, quizRepo)
 
 	// create a new serve mux
 	serverMux := mux.NewRouter()
