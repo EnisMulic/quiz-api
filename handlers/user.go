@@ -56,7 +56,7 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	list := u.r.GetUsers()
 
 	// serialize the list to JSON
-	err := list.ToJSON(rw)
+	err := domain.ToJSON(list, rw)
 	if err != nil {
 		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
 	}
@@ -79,7 +79,7 @@ func (u *Users) GetUser(rw http.ResponseWriter, r *http.Request) {
 	user := u.r.GetUser(id)
 
 	// serialize the list to JSON
-	err = user.ToJSON(rw)
+	err = domain.ToJSON(user, rw)
 	if err != nil {
 		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
 	}
@@ -163,7 +163,7 @@ func (u Users) MiddlewareValidateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		user := domain.User{}
 
-		err := user.FromJSON(r.Body)
+		err := domain.FromJSON(user, r.Body)
 		if err != nil {
 			u.l.Println("[ERROR] deserializing product", err)
 			http.Error(rw, "Error reading product", http.StatusBadRequest)

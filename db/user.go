@@ -2,9 +2,7 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 
 	"github.com/EnisMulic/quiz-api/domain"
 	"go.mongodb.org/mongo-driver/bson"
@@ -22,12 +20,6 @@ type UserRepository struct {
 // NewUserRepository ctor
 func NewUserRepository(c *mongo.Client) *UserRepository {
 	return &UserRepository{c}
-}
-
-// ToJSON serializes the contents of the collection to JSON
-func (u *Users) ToJSON(w io.Writer) error {
-	e := json.NewEncoder(w)
-	return e.Encode(u)
 }
 
 // Users a collection of Users
