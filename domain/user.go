@@ -19,3 +19,9 @@ func (u *User) Validate() error {
 	validate := validator.New()
 	return validate.Struct(u)
 }
+
+// UserUpsertRequest struct
+type UserUpsertRequest struct {
+	Username string `json:"username,omitempty" validate:"required"`
+	Email    string `json:"email,omitempty" validate:"email"`
+}

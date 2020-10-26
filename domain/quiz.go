@@ -4,7 +4,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // Quiz domain model
 type Quiz struct {
-	ID primitive.ObjectID `bson:"_id" json:"id"`
+	ID primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	// User      primitive.ObjectID `bson:"user_id" json:"user_id"`
 	Name      string     `json:"name"`
 	Timer     string     `json:"timer"`

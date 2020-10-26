@@ -73,8 +73,9 @@ func (q *Quizes) GetQuiz(rw http.ResponseWriter, r *http.Request) {
 func (q *Quizes) AddQuiz(rw http.ResponseWriter, r *http.Request) {
 	q.l.Println("Handle POST Quiz")
 
-	entity := r.Context().Value(KeyQuiz{}).(domain.Quiz)
-	q.r.AddQuiz(&entity)
+	entity := new(domain.Quiz)
+	domain.FromJSON(entity, r.Body)
+	q.r.AddQuiz(entity)
 
 	q.l.Printf("User: %#v", entity)
 }

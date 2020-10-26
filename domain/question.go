@@ -1,7 +1,5 @@
 package domain
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 // QuestionType Enumeration
 type QuestionType int
 
@@ -14,8 +12,7 @@ const (
 
 // Question domain model
 type Question struct {
-	ID           primitive.ObjectID `bson:"_id" json:"id"`
-	Text         string             `json:"text"`
-	Answers      []Answer           `json:"answers"`
-	QuestionType QuestionType       `json:"type"`
+	Text         string       `json:"text"`
+	Answers      []Answer     `json:"answers"`
+	QuestionType QuestionType `json:"type"`
 }

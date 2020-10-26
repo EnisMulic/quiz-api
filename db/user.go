@@ -60,22 +60,19 @@ func (ur *UserRepository) GetUser(id primitive.ObjectID) domain.User {
 }
 
 // AddUser adds a new User
-func (ur *UserRepository) AddUser(u *domain.User) domain.User {
-	result, err := ur.c.Database("quiz-app").Collection(userCollection).InsertOne(nil, u)
+func (ur *UserRepository) AddUser(u *domain.UserUpsertRequest) {
+	_, err := ur.c.Database("quiz-app").Collection(userCollection).InsertOne(nil, u)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
-
-	u.ID = result.InsertedID.(primitive.ObjectID)
-	return *u
 }
 
 // UpdateUser updates a user
-func (ur *UserRepository) UpdateUser(id primitive.ObjectID, data map[string]interface{}) error {
+func (ur *UserRepository) UpdateUser(id primitive.ObjectID, data *domain.UserUpsertRequest) error {
 	collection := ur.c.Database("quiz-app").Collection(userCollection)
 
-	updateData := bson.M{
-		"$set": data,
+	updateData := bson.D{
+		{"$set", data.Username},
 	}
 	result, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, updateData)
 

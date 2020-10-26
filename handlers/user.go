@@ -1,9 +1,6 @@
 package handlers
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -92,10 +89,14 @@ func (u *Users) GetUser(rw http.ResponseWriter, r *http.Request) {
 func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle POST User")
 
-	user := r.Context().Value(KeyUser{}).(domain.User)
-	u.r.AddUser(&user)
+	user := new(domain.UserUpsertRequest)
+	domain.FromJSON(user, r.Body)
+	u.r.AddUser(user)
 
-	u.l.Printf("User: %#v", user)
+	err := domain.ToJSON(user, rw)
+	if err != nil {
+		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
+	}
 }
 
 // swagger:route PUT /user/{id} user updateUser
@@ -107,19 +108,16 @@ func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id, err := primitive.ObjectIDFromHex(vars["id"])
+
 	if err != nil {
 		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
 		return
 	}
 
-	var updateData map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&updateData)
-	if err != nil {
-		http.Error(rw, "json body is incorrect", http.StatusBadRequest)
-		return
-	}
+	entity := new(domain.UserUpsertRequest)
+	domain.FromJSON(entity, r.Body)
 
-	err = u.r.UpdateUser(id, updateData)
+	err = u.r.UpdateUser(id, entity)
 	if err == db.ErrUserNotFound {
 		http.Error(rw, "User not found", http.StatusNotFound)
 		return
@@ -159,34 +157,34 @@ func (u *Users) DeleteUser(rw http.ResponseWriter, r *http.Request) {
 type KeyUser struct{}
 
 // MiddlewareValidateUser for validation
-func (u Users) MiddlewareValidateUser(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		user := domain.User{}
+// func (u Users) MiddlewareValidateUser(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+// 		user := domain.User{}
+// 		fmt.Printf("%v", r.Body)
+// 		err := domain.FromJSON(user, r.Body)
+// 		if err != nil {
+// 			u.l.Println("[ERROR] deserializing user", err)
+// 			http.Error(rw, "Error reading user", http.StatusBadRequest)
+// 			return
+// 		}
 
-		err := domain.FromJSON(user, r.Body)
-		if err != nil {
-			u.l.Println("[ERROR] deserializing product", err)
-			http.Error(rw, "Error reading product", http.StatusBadRequest)
-			return
-		}
+// 		// validate the user
+// 		err = user.Validate()
+// 		if err != nil {
+// 			u.l.Println("[ERROR] validating user", err)
+// 			http.Error(
+// 				rw,
+// 				fmt.Sprintf("Error validating user: %s", err),
+// 				http.StatusBadRequest,
+// 			)
+// 			return
+// 		}
 
-		// validate the user
-		err = user.Validate()
-		if err != nil {
-			u.l.Println("[ERROR] validating user", err)
-			http.Error(
-				rw,
-				fmt.Sprintf("Error validating user: %s", err),
-				http.StatusBadRequest,
-			)
-			return
-		}
+// 		// add the product to the context
+// 		ctx := context.WithValue(r.Context(), KeyUser{}, user)
+// 		r = r.WithContext(ctx)
 
-		// add the product to the context
-		ctx := context.WithValue(r.Context(), KeyUser{}, user)
-		r = r.WithContext(ctx)
-
-		// Call the next handler, which can be another middleware in the chain, or the final handler.
-		next.ServeHTTP(rw, r)
-	})
-}
+// 		// Call the next handler, which can be another middleware in the chain, or the final handler.
+// 		next.ServeHTTP(rw, r)
+// 	})
+// }

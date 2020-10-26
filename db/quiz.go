@@ -60,14 +60,11 @@ func (ur *QuizRepository) GetQuiz(id primitive.ObjectID) domain.Quiz {
 }
 
 // AddQuiz adds a new User
-func (ur *QuizRepository) AddQuiz(u *domain.Quiz) domain.Quiz {
-	result, err := ur.c.Database("quiz-app").Collection(quizCollection).InsertOne(nil, u)
+func (ur *QuizRepository) AddQuiz(u *domain.Quiz) {
+	_, err := ur.c.Database("quiz-app").Collection(quizCollection).InsertOne(nil, u)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
-
-	u.ID = result.InsertedID.(primitive.ObjectID)
-	return *u
 }
 
 // UpdateQuiz updates a user
