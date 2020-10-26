@@ -40,6 +40,7 @@ func main() {
 	// create handlers
 	userHandler := handlers.NewUser(logger, userRepo)
 	quizHandler := handlers.NewQuiz(logger, quizRepo)
+	authHandler := handlers.NewAuth(logger, userRepo)
 
 	// create a new serve mux
 	serverMux := mux.NewRouter()
@@ -64,6 +65,9 @@ func main() {
 
 	postRouter.HandleFunc("/quiz", quizHandler.AddQuiz)
 
+	postRouter.HandleFunc("/auth/register", authHandler.Register)
+	postRouter.HandleFunc("/auth/login", authHandler.Login)
+
 	deleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/user/{id}", userHandler.DeleteUser)
 
@@ -81,7 +85,7 @@ func main() {
 
 	// create the server
 	server := &http.Server{
-		Addr:         ":9090",
+		Addr:         ":8080",
 		Handler:      corsHandler(serverMux),
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,

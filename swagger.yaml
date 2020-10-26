@@ -1,5 +1,17 @@
 info: {}
 paths:
+  /auth/login:
+    post:
+      description: Login a user
+      operationId: login
+      tags:
+      - auth
+  /auth/register:
+    post:
+      description: Registers a user
+      operationId: register
+      tags:
+      - auth
   /quiz:
     get:
       description: Returns a list of quizes

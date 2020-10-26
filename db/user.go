@@ -61,7 +61,17 @@ func (ur *UserRepository) GetUser(id primitive.ObjectID) domain.User {
 
 // AddUser adds a new User
 func (ur *UserRepository) AddUser(u *domain.UserUpsertRequest) {
-	_, err := ur.c.Database("quiz-app").Collection(userCollection).InsertOne(nil, u)
+	var salt = generateRandomSalt(saltSize)
+	var hash = hashPassword(u.Password, salt)
+
+	user := domain.User{
+		Username: u.Username,
+		Email:    u.Email,
+		Salt:     string(salt),
+		Hash:     hash,
+	}
+
+	_, err := ur.c.Database("quiz-app").Collection(userCollection).InsertOne(nil, user)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}

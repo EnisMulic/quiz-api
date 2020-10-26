@@ -24,4 +24,5 @@ func (u *User) Validate() error {
 type UserUpsertRequest struct {
 	Username string `json:"username,omitempty" validate:"required"`
 	Email    string `json:"email,omitempty" validate:"email"`
+	Password string `json:"password,ommitempty"`
 }
