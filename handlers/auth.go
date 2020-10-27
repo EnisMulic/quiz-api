@@ -32,6 +32,7 @@ func (a *Auth) Register(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
 	}
+
 }
 
 // swagger:route POST /auth/login auth login
@@ -39,5 +40,14 @@ func (a *Auth) Register(rw http.ResponseWriter, r *http.Request) {
 
 // Login as a user
 func (a *Auth) Login(rw http.ResponseWriter, r *http.Request) {
+	user := new(domain.UserUpsertRequest)
+	domain.FromJSON(user, r.Body)
 
+	jwt, err := a.r.Login(user)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	rw.Write([]byte(`{"token":"` + jwt + `"}`))
 }

@@ -3,6 +3,7 @@ module github.com/EnisMulic/quiz-api
 go 1.15
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bongo/go-dotaccess v0.0.0-20190924013105-74ea4f4ca4eb // indirect
 	github.com/go-openapi/runtime v0.19.23
 	github.com/go-playground/universal-translator v0.17.0 // indirect
@@ -14,5 +15,6 @@ require (
 	github.com/oleiade/reflections v1.0.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	go.mongodb.org/mongo-driver v1.4.2
+	golang.org/x/crypto v0.0.0-20190617133340-57b3e21c3d56
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )

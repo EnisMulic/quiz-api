@@ -4,6 +4,9 @@ import (
 	"crypto/rand"
 	"crypto/sha512"
 	"encoding/base64"
+	"log"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 // Define the size of the salt
@@ -12,7 +15,7 @@ const saltSize = 16
 // Generate a random 16 bytes securely using the
 // Cryptographically secure pseudorandom number generator (CSPRNG)
 // int the crypto.rand package
-func generateRandomSalt(saltSize int) []byte {
+func generateRandomSalt(saltSize int) string {
 	var salt = make([]byte, saltSize)
 
 	_, err := rand.Read(salt[:])
@@ -21,21 +24,22 @@ func generateRandomSalt(saltSize int) []byte {
 		panic(err)
 	}
 
-	return salt
+	return string(salt)
 }
 
 // Combine our password and salt and hash them using the SHA-512
 // hashing algorithm and then return our hashed password
 // as a base64 encoded string
-func hashPassword(password string, salt []byte) string {
+func hashPassword(password string, salt string) string {
 	// Convert password string to byte slice
 	var passwordBytes = []byte(password)
+	var saltBytes = []byte(salt)
 
 	// Create sha-512 hasher
 	var sha512Hasher = sha512.New()
 
 	// Append salt to password
-	passwordBytes = append(passwordBytes, salt...)
+	passwordBytes = append(passwordBytes, saltBytes...)
 
 	// Write password bytes to the hasher
 	sha512Hasher.Write(passwordBytes)
@@ -50,8 +54,21 @@ func hashPassword(password string, salt []byte) string {
 }
 
 // Check if two passwords match
-func doPasswordsMatch(passwordHash, currPassword string, salt []byte) bool {
+func doPasswordsMatch(passwordHash string, currPassword string, salt string) bool {
 	var currPasswordHash = hashPassword(currPassword, salt)
 
 	return passwordHash == currPasswordHash
+}
+
+var secretKey = []byte("gosecretkey")
+
+// GenerateJWT generate a json web token
+func GenerateJWT() (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		log.Println("Error in JWT token generation")
+		return "", err
+	}
+	return tokenString, nil
 }

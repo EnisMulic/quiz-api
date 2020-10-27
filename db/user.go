@@ -64,11 +64,11 @@ func (ur *UserRepository) AddUser(u *domain.UserUpsertRequest) {
 	var salt = generateRandomSalt(saltSize)
 	var hash = hashPassword(u.Password, salt)
 
-	user := domain.User{
-		Username: u.Username,
-		Email:    u.Email,
-		Salt:     string(salt),
-		Hash:     hash,
+	user := map[string]string{
+		"username": u.Username,
+		"email":    u.Email,
+		"salt":     salt,
+		"hash":     hash,
 	}
 
 	_, err := ur.c.Database("quiz-app").Collection(userCollection).InsertOne(nil, user)
@@ -112,6 +112,29 @@ func (ur *UserRepository) DeleteUser(id primitive.ObjectID) error {
 	}
 
 	return nil
+}
+
+// Login return a jwt if password and email are correct
+func (ur *UserRepository) Login(request *domain.UserUpsertRequest) (string, error) {
+	collection := ur.c.Database("quiz-app").Collection(userCollection)
+
+	var dbUser domain.User
+	err := collection.FindOne(context.Background(), bson.M{"email": request.Email}).Decode(&dbUser)
+
+	// userPass := hashPassword(request.Password, dbUser.Salt)
+	// dbPass := []byte("$" + dbUser.Hash)
+
+	// passErr := bcrypt.CompareHashAndPassword(dbPass, []byte(userPass))
+	if doPasswordsMatch(dbUser.Hash, request.Password, dbUser.Salt) == false {
+		return "", fmt.Errorf(`{"response":"Wrong Password!"}`)
+	}
+
+	jwtToken, err := GenerateJWT()
+	if err != nil {
+		return "", fmt.Errorf(`{"message":"` + err.Error() + `"}`)
+	}
+
+	return jwtToken, nil
 }
 
 // ErrUserNotFound an error
