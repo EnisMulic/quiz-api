@@ -129,7 +129,7 @@ func (ur *UserRepository) Login(request *domain.UserUpsertRequest) (string, erro
 		return "", fmt.Errorf(`{"response":"Wrong Password!"}`)
 	}
 
-	jwtToken, err := GenerateJWT()
+	jwtToken, err := GenerateJWT(dbUser)
 	if err != nil {
 		return "", fmt.Errorf(`{"message":"` + err.Error() + `"}`)
 	}

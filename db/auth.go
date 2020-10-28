@@ -5,7 +5,9 @@ import (
 	"crypto/sha512"
 	"encoding/base64"
 	"log"
+	"time"
 
+	"github.com/EnisMulic/quiz-api/domain"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -63,8 +65,16 @@ func doPasswordsMatch(passwordHash string, currPassword string, salt string) boo
 var secretKey = []byte("gosecretkey")
 
 // GenerateJWT generate a json web token
-func GenerateJWT() (string, error) {
+func GenerateJWT(user domain.User) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	claims["authorized"] = true
+	claims["email"] = user.Email
+	claims["username"] = user.Username
+	claims["exp"] = time.Now().Add(time.Minute * 60).Unix()
+
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
 		log.Println("Error in JWT token generation")
