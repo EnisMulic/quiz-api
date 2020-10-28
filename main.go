@@ -44,7 +44,6 @@ func main() {
 
 	// create a new serve mux
 	serverMux := mux.NewRouter()
-	//serverMux.Handle("/user", userHandler).Methods("GET")
 
 	getRouter := serverMux.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/user", userHandler.GetUsers)
@@ -65,13 +64,20 @@ func main() {
 
 	postRouter.HandleFunc("/quiz", quizHandler.AddQuiz)
 
-	postRouter.HandleFunc("/auth/register", authHandler.Register)
-	postRouter.HandleFunc("/auth/login", authHandler.Login)
-
 	deleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/user/{id}", userHandler.DeleteUser)
 
 	deleteRouter.HandleFunc("/quiz/{id}", quizHandler.DeleteQuiz)
+
+	authRouter := serverMux.Methods(http.MethodPost).Subrouter()
+	authRouter.HandleFunc("/auth/register", authHandler.Register)
+	authRouter.HandleFunc("/auth/login", authHandler.Login)
+
+	// add auth middleware
+	getRouter.Use(handlers.IsAuthorized)
+	postRouter.Use(handlers.IsAuthorized)
+	putRouter.Use(handlers.IsAuthorized)
+	deleteRouter.Use(handlers.IsAuthorized)
 
 	// handler for documentation
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
