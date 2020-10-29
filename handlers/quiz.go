@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -73,7 +72,7 @@ func (q *Quizes) GetQuiz(rw http.ResponseWriter, r *http.Request) {
 func (q *Quizes) AddQuiz(rw http.ResponseWriter, r *http.Request) {
 	q.l.Println("Handle POST Quiz")
 
-	entity := new(domain.Quiz)
+	entity := new(domain.QuizUpsertRequest)
 	domain.FromJSON(entity, r.Body)
 	q.r.AddQuiz(entity)
 
@@ -92,14 +91,10 @@ func (q *Quizes) UpdateQuiz(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var updateData map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&updateData)
-	if err != nil {
-		http.Error(rw, "json body is incorrect", http.StatusBadRequest)
-		return
-	}
+	user := new(domain.QuizUpsertRequest)
+	domain.FromJSON(user, r.Body)
 
-	err = q.r.UpdateQuiz(id, updateData)
+	err = q.r.UpdateQuiz(id, user)
 	if err == db.ErrQuizNotFound {
 		http.Error(rw, "User not found", http.StatusNotFound)
 		return

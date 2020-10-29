@@ -10,3 +10,10 @@ type Quiz struct {
 	Timer     string     `json:"timer"`
 	Questions []Question `json:"questions"`
 }
+
+// QuizUpsertRequest model
+type QuizUpsertRequest struct {
+	Name      string     `json:"name"`
+	Timer     string     `json:"timer"`
+	Questions []Question `json:"questions"`
+}

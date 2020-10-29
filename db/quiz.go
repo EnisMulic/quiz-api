@@ -54,7 +54,7 @@ func (r *QuizRepository) GetQuiz(id primitive.ObjectID) domain.Quiz {
 }
 
 // AddQuiz adds a new User
-func (r *QuizRepository) AddQuiz(u *domain.Quiz) {
+func (r *QuizRepository) AddQuiz(u *domain.QuizUpsertRequest) {
 	_, err := r.collection.InsertOne(nil, u)
 	if err != nil {
 		fmt.Printf("%s", err)
@@ -62,7 +62,7 @@ func (r *QuizRepository) AddQuiz(u *domain.Quiz) {
 }
 
 // UpdateQuiz updates a user
-func (r *QuizRepository) UpdateQuiz(id primitive.ObjectID, data map[string]interface{}) error {
+func (r *QuizRepository) UpdateQuiz(id primitive.ObjectID, data *domain.QuizUpsertRequest) error {
 	updateData := bson.M{
 		"$set": data,
 	}
