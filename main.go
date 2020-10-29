@@ -83,8 +83,9 @@ func main() {
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := middleware.Redoc(opts, nil)
 
-	getRouter.Handle("/docs", sh)
-	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+	docsRouter := serverMux.Methods(http.MethodGet).Subrouter()
+	docsRouter.Handle("/docs", sh)
+	docsRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	// CORS
 	corsHandler := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"*"}))
