@@ -73,16 +73,29 @@ func (r *UserRepository) AddUser(u *domain.UserUpsertRequest) {
 
 // UpdateUser updates a user
 func (r *UserRepository) UpdateUser(id primitive.ObjectID, data *domain.UserUpsertRequest) error {
-	var user domain.User
-	err := r.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	user := new(domain.User)
+	err := r.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(user)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
 
-	updateData := bson.D{
-		{"$set", data.Username},
+	fmt.Printf("%v", id)
+
+	if data.Password != "" {
+		if doPasswordsMatch(user.Hash, data.Password, user.Salt) == false {
+			user.Salt = generateRandomSalt(saltSize)
+			user.Hash = hashPassword(data.Password, user.Salt)
+		}
 	}
-	result, err := r.collection.UpdateOne(context.Background(), bson.M{"_id": id}, updateData)
+
+	updateData := bson.M{
+		"username": data.Username,
+		"email":    data.Email,
+		"salt":     user.Salt,
+		"hash":     user.Hash,
+	}
+
+	result, err := r.collection.ReplaceOne(context.TODO(), bson.M{"_id": id}, updateData)
 
 	if result.MatchedCount != 1 {
 		return ErrUserNotFound
@@ -115,10 +128,6 @@ func (r *UserRepository) Login(request *domain.UserUpsertRequest) (string, error
 	var dbUser domain.User
 	err := r.collection.FindOne(context.Background(), bson.M{"email": request.Email}).Decode(&dbUser)
 
-	// userPass := hashPassword(request.Password, dbUser.Salt)
-	// dbPass := []byte("$" + dbUser.Hash)
-
-	// passErr := bcrypt.CompareHashAndPassword(dbPass, []byte(userPass))
 	if doPasswordsMatch(dbUser.Hash, request.Password, dbUser.Salt) == false {
 		return "", fmt.Errorf(`{"response":"Wrong Password!"}`)
 	}

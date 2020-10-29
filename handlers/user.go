@@ -108,16 +108,15 @@ func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id, err := primitive.ObjectIDFromHex(vars["id"])
-
 	if err != nil {
 		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
 		return
 	}
 
-	entity := new(domain.UserUpsertRequest)
-	domain.FromJSON(entity, r.Body)
+	user := new(domain.UserUpsertRequest)
+	domain.FromJSON(user, r.Body)
 
-	err = u.r.UpdateUser(id, entity)
+	err = u.r.UpdateUser(id, user)
 	if err == db.ErrUserNotFound {
 		http.Error(rw, "User not found", http.StatusNotFound)
 		return
