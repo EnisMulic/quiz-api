@@ -45,6 +45,12 @@ paths:
       operationId: addQuestionToQuiz
       tags:
       - quiz
+  /quiz/{id}/question/{question_id}:
+    delete:
+      description: Remove a question from a quiz
+      operationId: deleteQuestionFromQuiz
+      tags:
+      - quiz
   /user:
     get:
       description: Returns a list of users

@@ -156,3 +156,35 @@ func (q *Quizes) AddQuestion(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
 	}
 }
+
+// swagger:route DELETE /quiz/{id}/question/{question_id} quiz deleteQuestionFromQuiz
+// Remove a question from a quiz
+
+// DeleteQuestion deletes a question from a quiz
+func (q *Quizes) DeleteQuestion(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := primitive.ObjectIDFromHex(vars["id"])
+	if err != nil {
+		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
+		return
+	}
+
+	questionID, questionIDerr := primitive.ObjectIDFromHex(vars["question_id"])
+	if questionIDerr != nil {
+		http.Error(rw, "Unable to convert question_id", http.StatusBadRequest)
+		return
+	}
+
+	quiz, deleteErr := q.r.DeleteQuestion(id, questionID)
+	if deleteErr == db.ErrQuizNotFound {
+		http.Error(rw, "Quiz not found", http.StatusNotFound)
+		return
+	}
+
+	if deleteErr != nil {
+		http.Error(rw, "Quiz not found", http.StatusInternalServerError)
+		return
+	}
+
+	domain.ToJSON(quiz, rw)
+}

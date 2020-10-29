@@ -71,6 +71,8 @@ func main() {
 
 	deleteRouter.HandleFunc("/quiz/{id}", quizHandler.DeleteQuiz)
 
+	deleteRouter.HandleFunc("/quiz/{id}/question/{question_id}", quizHandler.DeleteQuestion)
+
 	authRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	authRouter.HandleFunc("/auth/register", authHandler.Register)
 	authRouter.HandleFunc("/auth/login", authHandler.Login)
