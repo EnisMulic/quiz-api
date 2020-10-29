@@ -47,7 +47,7 @@ func (q *Quizes) GetQuizes(rw http.ResponseWriter, r *http.Request) {
 
 // GetQuiz returns the quiz from the data store
 func (q *Quizes) GetQuiz(rw http.ResponseWriter, r *http.Request) {
-	q.l.Println("Handle GET User")
+	q.l.Println("Handle GET Quiz")
 
 	vars := mux.Vars(r)
 	id, err := primitive.ObjectIDFromHex(vars["id"])
@@ -127,5 +127,32 @@ func (q *Quizes) DeleteQuiz(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(rw, "Quiz not found", http.StatusInternalServerError)
 		return
+	}
+}
+
+// swagger:route POST /quiz/{id}/question quiz addQuestionToQuiz
+// Create a new question in a quiz
+
+// AddQuestion adds a question to a quiz
+func (q *Quizes) AddQuestion(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := primitive.ObjectIDFromHex(vars["id"])
+	if err != nil {
+		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
+		return
+	}
+
+	entity := new(domain.Question)
+	domain.FromJSON(entity, r.Body)
+	quiz, addErr := q.r.AddQuestion(id, *entity)
+
+	if err != nil {
+		http.Error(rw, addErr.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = domain.ToJSON(quiz, rw)
+	if err != nil {
+		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
 	}
 }

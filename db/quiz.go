@@ -94,5 +94,24 @@ func (r *QuizRepository) DeleteQuiz(id primitive.ObjectID) error {
 	return nil
 }
 
+// AddQuestion to quiz
+func (r *QuizRepository) AddQuestion(id primitive.ObjectID, question domain.Question) (domain.Quiz, error) {
+	question.ID = primitive.NewObjectID()
+	var entity domain.Quiz
+	err := r.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&entity)
+	if err != nil {
+		return domain.Quiz{}, err
+	}
+
+	entity.Questions = append(entity.Questions, question)
+	_, err = r.collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.M{"$set": entity})
+
+	if err != nil {
+		return domain.Quiz{}, err
+	}
+
+	return entity, nil
+}
+
 // ErrQuizNotFound an error
 var ErrQuizNotFound = fmt.Errorf("Quiz not found")

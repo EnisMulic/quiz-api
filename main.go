@@ -64,6 +64,8 @@ func main() {
 
 	postRouter.HandleFunc("/quiz", quizHandler.AddQuiz)
 
+	postRouter.HandleFunc("/quiz/{id}/question", quizHandler.AddQuestion)
+
 	deleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/user/{id}", userHandler.DeleteUser)
 
