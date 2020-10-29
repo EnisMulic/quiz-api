@@ -10,27 +10,23 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var userCollection string = "users"
-
 // UserRepository struct
 type UserRepository struct {
-	c *mongo.Client
+	collection *mongo.Collection
 }
 
 // NewUserRepository ctor
 func NewUserRepository(c *mongo.Client) *UserRepository {
-	return &UserRepository{c}
+	return &UserRepository{c.Database("quiz-app").Collection("users")}
 }
 
 // Users a collection of Users
 type Users []*domain.User
 
 // GetUsers returns a slice of Users
-func (ur *UserRepository) GetUsers() Users {
-	collection := ur.c.Database("quiz-app").Collection(userCollection)
-
+func (r *UserRepository) GetUsers() Users {
 	var list Users
-	cur, err := collection.Find(nil, bson.M{})
+	cur, err := r.collection.Find(nil, bson.M{})
 
 	if err != nil {
 		fmt.Printf("%s", err)
@@ -47,11 +43,9 @@ func (ur *UserRepository) GetUsers() Users {
 }
 
 // GetUser returns a single user
-func (ur *UserRepository) GetUser(id primitive.ObjectID) domain.User {
-	collection := ur.c.Database("quiz-app").Collection(userCollection)
-
+func (r *UserRepository) GetUser(id primitive.ObjectID) domain.User {
 	var user domain.User
-	err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	err := r.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
@@ -60,7 +54,7 @@ func (ur *UserRepository) GetUser(id primitive.ObjectID) domain.User {
 }
 
 // AddUser adds a new User
-func (ur *UserRepository) AddUser(u *domain.UserUpsertRequest) {
+func (r *UserRepository) AddUser(u *domain.UserUpsertRequest) {
 	var salt = generateRandomSalt(saltSize)
 	var hash = hashPassword(u.Password, salt)
 
@@ -71,20 +65,24 @@ func (ur *UserRepository) AddUser(u *domain.UserUpsertRequest) {
 		"hash":     hash,
 	}
 
-	_, err := ur.c.Database("quiz-app").Collection(userCollection).InsertOne(nil, user)
+	_, err := r.collection.InsertOne(nil, user)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
 }
 
 // UpdateUser updates a user
-func (ur *UserRepository) UpdateUser(id primitive.ObjectID, data *domain.UserUpsertRequest) error {
-	collection := ur.c.Database("quiz-app").Collection(userCollection)
+func (r *UserRepository) UpdateUser(id primitive.ObjectID, data *domain.UserUpsertRequest) error {
+	var user domain.User
+	err := r.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	if err != nil {
+		fmt.Printf("%s", err)
+	}
 
 	updateData := bson.D{
 		{"$set", data.Username},
 	}
-	result, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, updateData)
+	result, err := r.collection.UpdateOne(context.Background(), bson.M{"_id": id}, updateData)
 
 	if result.MatchedCount != 1 {
 		return ErrUserNotFound
@@ -98,10 +96,8 @@ func (ur *UserRepository) UpdateUser(id primitive.ObjectID, data *domain.UserUps
 }
 
 // DeleteUser removes a user from the database
-func (ur *UserRepository) DeleteUser(id primitive.ObjectID) error {
-	collection := ur.c.Database("quiz-app").Collection(userCollection)
-
-	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": id})
+func (r *UserRepository) DeleteUser(id primitive.ObjectID) error {
+	result, err := r.collection.DeleteOne(context.Background(), bson.M{"_id": id})
 
 	if result.DeletedCount != 1 {
 		return ErrUserNotFound
@@ -115,11 +111,9 @@ func (ur *UserRepository) DeleteUser(id primitive.ObjectID) error {
 }
 
 // Login return a jwt if password and email are correct
-func (ur *UserRepository) Login(request *domain.UserUpsertRequest) (string, error) {
-	collection := ur.c.Database("quiz-app").Collection(userCollection)
-
+func (r *UserRepository) Login(request *domain.UserUpsertRequest) (string, error) {
 	var dbUser domain.User
-	err := collection.FindOne(context.Background(), bson.M{"email": request.Email}).Decode(&dbUser)
+	err := r.collection.FindOne(context.Background(), bson.M{"email": request.Email}).Decode(&dbUser)
 
 	// userPass := hashPassword(request.Password, dbUser.Salt)
 	// dbPass := []byte("$" + dbUser.Hash)

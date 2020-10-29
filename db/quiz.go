@@ -10,27 +10,23 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var quizCollection string = "quiz"
-
 // QuizRepository struct
 type QuizRepository struct {
-	c *mongo.Client
+	collection *mongo.Collection
 }
 
 // NewQuizRepository ctor
 func NewQuizRepository(c *mongo.Client) *QuizRepository {
-	return &QuizRepository{c}
+	return &QuizRepository{c.Database("quiz-app").Collection("quiz")}
 }
 
 // Quizzes a collection of Quizzes
 type Quizzes []*domain.Quiz
 
 // GetQuizzes returns a slice of Quizzes
-func (ur *QuizRepository) GetQuizzes() Quizzes {
-	collection := ur.c.Database("quiz-app").Collection(quizCollection)
-
+func (r *QuizRepository) GetQuizzes() Quizzes {
 	var list Quizzes
-	cur, err := collection.Find(nil, bson.M{})
+	cur, err := r.collection.Find(nil, bson.M{})
 
 	if err != nil {
 		fmt.Printf("%s", err)
@@ -47,11 +43,9 @@ func (ur *QuizRepository) GetQuizzes() Quizzes {
 }
 
 // GetQuiz returns a single quiz
-func (ur *QuizRepository) GetQuiz(id primitive.ObjectID) domain.Quiz {
-	collection := ur.c.Database("quiz-app").Collection(quizCollection)
-
+func (r *QuizRepository) GetQuiz(id primitive.ObjectID) domain.Quiz {
 	var entity domain.Quiz
-	err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&entity)
+	err := r.collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&entity)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
@@ -60,21 +54,19 @@ func (ur *QuizRepository) GetQuiz(id primitive.ObjectID) domain.Quiz {
 }
 
 // AddQuiz adds a new User
-func (ur *QuizRepository) AddQuiz(u *domain.Quiz) {
-	_, err := ur.c.Database("quiz-app").Collection(quizCollection).InsertOne(nil, u)
+func (r *QuizRepository) AddQuiz(u *domain.Quiz) {
+	_, err := r.collection.InsertOne(nil, u)
 	if err != nil {
 		fmt.Printf("%s", err)
 	}
 }
 
 // UpdateQuiz updates a user
-func (ur *QuizRepository) UpdateQuiz(id primitive.ObjectID, data map[string]interface{}) error {
-	collection := ur.c.Database("quiz-app").Collection(quizCollection)
-
+func (r *QuizRepository) UpdateQuiz(id primitive.ObjectID, data map[string]interface{}) error {
 	updateData := bson.M{
 		"$set": data,
 	}
-	result, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, updateData)
+	result, err := r.collection.UpdateOne(context.Background(), bson.M{"_id": id}, updateData)
 
 	if result.MatchedCount != 1 {
 		return ErrQuizNotFound
@@ -88,10 +80,8 @@ func (ur *QuizRepository) UpdateQuiz(id primitive.ObjectID, data map[string]inte
 }
 
 // DeleteQuiz removes a quiz from the database
-func (ur *QuizRepository) DeleteQuiz(id primitive.ObjectID) error {
-	collection := ur.c.Database("quiz-app").Collection(quizCollection)
-
-	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": id})
+func (r *QuizRepository) DeleteQuiz(id primitive.ObjectID) error {
+	result, err := r.collection.DeleteOne(context.Background(), bson.M{"_id": id})
 
 	if result.DeletedCount != 1 {
 		return ErrQuizNotFound
