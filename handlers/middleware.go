@@ -72,3 +72,35 @@ func (u Users) MiddlewareValidateUser(next http.Handler) http.Handler {
 		next.ServeHTTP(rw, r)
 	})
 }
+
+// MiddlewareValidateQuiz for validation
+func (q Quizes) MiddlewareValidateQuiz(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		quiz := new(domain.QuizUpsertRequest)
+		err := domain.FromJSON(quiz, r.Body)
+		if err != nil {
+			q.l.Println("[ERROR] deserializing quiz", err)
+			http.Error(rw, "Error reading user", http.StatusBadRequest)
+			return
+		}
+
+		// validate the user
+		err = domain.Validate(quiz)
+		if err != nil {
+			q.l.Println("[ERROR] validating quiz", err)
+			http.Error(
+				rw,
+				fmt.Sprintf("Error validating quiz: %s", err),
+				http.StatusBadRequest,
+			)
+			return
+		}
+
+		// add the product to the context
+		ctx := context.WithValue(r.Context(), KeyStruct{}, quiz)
+		r = r.WithContext(ctx)
+
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(rw, r)
+	})
+}

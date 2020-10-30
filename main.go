@@ -74,30 +74,30 @@ func main() {
 	quizPutRouter := serverMux.Methods(http.MethodPut).Subrouter()
 	quizPutRouter.HandleFunc("/quiz/{id}", quizHandler.UpdateQuiz)
 	quizPutRouter.Use(handlers.IsAuthorized)
+	quizPutRouter.Use(quizHandler.MiddlewareValidateQuiz)
 
 	quizPostRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	quizPostRouter.HandleFunc("/quiz", quizHandler.AddQuiz)
 	quizPostRouter.Use(handlers.IsAuthorized)
-
-	questionPostRouter := serverMux.Methods(http.MethodPost).Subrouter()
-	questionPostRouter.HandleFunc("/quiz/{id}/question", quizHandler.AddQuestion)
+	quizPostRouter.Use(quizHandler.MiddlewareValidateQuiz)
 
 	quizDeleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
 	quizDeleteRouter.HandleFunc("/quiz/{id}", quizHandler.DeleteQuiz)
+	quizDeleteRouter.Use(handlers.IsAuthorized)
+
+	// question router
+	questionPostRouter := serverMux.Methods(http.MethodPost).Subrouter()
+	questionPostRouter.HandleFunc("/quiz/{id}/question", quizHandler.AddQuestion)
+	questionPostRouter.Use(handlers.IsAuthorized)
 
 	questionDeleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
 	questionDeleteRouter.HandleFunc("/quiz/{id}/question/{question_id}", quizHandler.DeleteQuestion)
+	questionDeleteRouter.Use(handlers.IsAuthorized)
 
+	// authentication router
 	authRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	authRouter.HandleFunc("/auth/register", authHandler.Register)
 	authRouter.HandleFunc("/auth/login", authHandler.Login)
-
-	// add auth middleware
-
-	questionPostRouter.Use(handlers.IsAuthorized)
-
-	quizDeleteRouter.Use(handlers.IsAuthorized)
-	questionDeleteRouter.Use(handlers.IsAuthorized)
 
 	// handler for documentation
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}

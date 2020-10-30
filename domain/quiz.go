@@ -13,7 +13,7 @@ type Quiz struct {
 
 // QuizUpsertRequest model
 type QuizUpsertRequest struct {
-	Name   string             `json:"name"`
-	UserID primitive.ObjectID `bson:"user_id" json:"user_id"`
+	Name   string             `json:"name" validate:"required"`
+	UserID primitive.ObjectID `bson:"user_id" json:"user_id" validate:"required"`
 	Timer  string             `json:"timer"`
 }
