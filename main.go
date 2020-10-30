@@ -54,13 +54,13 @@ func main() {
 
 	putRouter := serverMux.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/user/{id}", userHandler.UpdateUser)
-	// putRouter.Use(userHandler.MiddlewareValidateUser)
+	putRouter.Use(userHandler.MiddlewareValidateUser)
 
 	putRouter.HandleFunc("/quiz/{id}", quizHandler.UpdateQuiz)
 
 	postRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/user", userHandler.AddUser)
-	// postRouter.Use(userHandler.MiddlewareValidateUser)
+	postRouter.Use(userHandler.MiddlewareValidateUser)
 
 	postRouter.HandleFunc("/quiz", quizHandler.AddQuiz)
 

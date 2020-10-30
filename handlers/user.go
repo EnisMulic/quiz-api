@@ -151,39 +151,3 @@ func (u *Users) DeleteUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-// KeyUser a key
-type KeyUser struct{}
-
-// MiddlewareValidateUser for validation
-// func (u Users) MiddlewareValidateUser(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-// 		user := domain.User{}
-// 		fmt.Printf("%v", r.Body)
-// 		err := domain.FromJSON(user, r.Body)
-// 		if err != nil {
-// 			u.l.Println("[ERROR] deserializing user", err)
-// 			http.Error(rw, "Error reading user", http.StatusBadRequest)
-// 			return
-// 		}
-
-// 		// validate the user
-// 		err = user.Validate()
-// 		if err != nil {
-// 			u.l.Println("[ERROR] validating user", err)
-// 			http.Error(
-// 				rw,
-// 				fmt.Sprintf("Error validating user: %s", err),
-// 				http.StatusBadRequest,
-// 			)
-// 			return
-// 		}
-
-// 		// add the product to the context
-// 		ctx := context.WithValue(r.Context(), KeyUser{}, user)
-// 		r = r.WithContext(ctx)
-
-// 		// Call the next handler, which can be another middleware in the chain, or the final handler.
-// 		next.ServeHTTP(rw, r)
-// 	})
-// }

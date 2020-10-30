@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"github.com/go-playground/validator"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -12,12 +11,6 @@ type User struct {
 	Email    string             `json:"email" validate:"email"`
 	Salt     string             `json:"salt"`
 	Hash     string             `json:"hash"`
-}
-
-// Validate User domain model
-func (u *User) Validate() error {
-	validate := validator.New()
-	return validate.Struct(u)
 }
 
 // UserUpsertRequest struct
