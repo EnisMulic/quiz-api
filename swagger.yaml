@@ -1,3 +1,79 @@
+definitions:
+  Answer:
+    description: Answer domain model
+    properties:
+      id:
+        $ref: '#/definitions/ObjectID'
+      is_correct:
+        type: boolean
+        x-go-name: IsCorrect
+      text:
+        type: string
+        x-go-name: Text
+    type: object
+    x-go-package: github.com/EnisMulic/quiz-api/domain
+  ObjectID:
+    items:
+      format: uint8
+      type: integer
+    title: ObjectID is the BSON ObjectID type.
+    type: array
+    x-go-package: go.mongodb.org/mongo-driver/bson/primitive
+  Question:
+    description: Question domain model
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/Answer'
+        type: array
+        x-go-name: Answers
+      id:
+        $ref: '#/definitions/ObjectID'
+      text:
+        type: string
+        x-go-name: Text
+      type:
+        $ref: '#/definitions/QuestionType'
+    type: object
+    x-go-package: github.com/EnisMulic/quiz-api/domain
+  QuestionType:
+    description: QuestionType Enumeration
+    format: int64
+    type: integer
+    x-go-package: github.com/EnisMulic/quiz-api/domain
+  Quiz:
+    description: Quiz domain model
+    properties:
+      id:
+        $ref: '#/definitions/ObjectID'
+      name:
+        type: string
+        x-go-name: Name
+      questions:
+        items:
+          $ref: '#/definitions/Question'
+        type: array
+        x-go-name: Questions
+      timer:
+        type: string
+        x-go-name: Timer
+      user_id:
+        $ref: '#/definitions/ObjectID'
+    type: object
+    x-go-package: github.com/EnisMulic/quiz-api/domain
+  User:
+    description: User domain model
+    properties:
+      email:
+        type: string
+        x-go-name: Email
+      id:
+        $ref: '#/definitions/ObjectID'
+      username:
+        type: string
+        x-go-name: Username
+    type: object
+    x-go-package: github.com/EnisMulic/quiz-api/domain
 info: {}
 paths:
   /auth/login:
@@ -16,6 +92,9 @@ paths:
     get:
       description: Returns a list of quizes
       operationId: listQuiz
+      responses:
+        "200":
+          $ref: '#/responses/QuizzesResponse'
       tags:
       - quiz
     post:
@@ -32,6 +111,9 @@ paths:
     get:
       description: Returns a single quiz
       operationId: singleQuiz
+      responses:
+        "200":
+          $ref: '#/responses/QuizResponse'
       tags:
       - quiz
     put:
@@ -55,6 +137,9 @@ paths:
     get:
       description: Returns a list of users
       operationId: listUser
+      responses:
+        "200":
+          $ref: '#/responses/UsersResponse'
       tags:
       - user
     post:
@@ -66,16 +151,60 @@ paths:
     delete:
       description: Delete a user
       operationId: deleteUser
+      responses:
+        "404":
+          $ref: '#/responses/noContentResponse'
       tags:
       - user
     get:
       description: Returns a single user
       operationId: singleUser
+      responses:
+        "200":
+          $ref: '#/responses/UserResponse'
       tags:
       - user
     put:
       description: Update a users details
       operationId: updateUser
+      responses:
+        "404":
+          $ref: '#/responses/noContentResponse'
       tags:
       - user
+responses:
+  QuizResponse:
+    description: |-
+      QuizResponse dto
+
+      A user
+    schema:
+      $ref: '#/definitions/Quiz'
+  QuizzesResponse:
+    description: |-
+      QuizzesResponse dto
+
+      A list of users
+    schema:
+      items:
+        $ref: '#/definitions/Quiz'
+      type: array
+  UserResponse:
+    description: |-
+      UserResponse dto
+
+      A user
+    schema:
+      $ref: '#/definitions/User'
+  UsersResponse:
+    description: |-
+      UsersResponse dto
+
+      A list of users
+    schema:
+      items:
+        $ref: '#/definitions/User'
+      type: array
+  noContentResponse:
+    description: No content is returned by this API endpoint
 swagger: "2.0"

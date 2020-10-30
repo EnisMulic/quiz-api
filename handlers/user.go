@@ -10,20 +10,20 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// UsersResponse dto
+//
 // A list of users
 // swagger:response UsersResponse
-
-// UsersResponse dto
 type UsersResponse struct {
 	// All users in the db
 	// in: body
 	Body []domain.User
 }
 
+// UserResponse dto
+//
 // A user
 // swagger:response UserResponse
-
-// UserResponse dto
 type UserResponse struct {
 	// A User in the db
 	// in: body
@@ -43,6 +43,9 @@ func NewUser(l *log.Logger, r *db.UserRepository) *Users {
 
 // swagger:route GET /user user listUser
 // Returns a list of users
+//
+// responses:
+//	200: UsersResponse
 
 // GetUsers returns the Users from the data store
 func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
@@ -61,6 +64,9 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 
 // swagger:route GET /user/{id} user singleUser
 // Returns a single user
+//
+// responses:
+//	200: UserResponse
 
 // GetUser returns the Users from the data store
 func (u *Users) GetUser(rw http.ResponseWriter, r *http.Request) {
@@ -101,6 +107,9 @@ func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 
 // swagger:route PUT /user/{id} user updateUser
 // Update a users details
+//
+// responses:
+//	404: noContentResponse
 
 // UpdateUser updates a user
 func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
@@ -130,6 +139,9 @@ func (u *Users) UpdateUser(rw http.ResponseWriter, r *http.Request) {
 
 // swagger:route DELETE /user/{id} user deleteUser
 // Delete a user
+//
+// responses:
+//	404: noContentResponse
 
 // DeleteUser handles DELETE requests and removes items from the db
 func (u *Users) DeleteUser(rw http.ResponseWriter, r *http.Request) {

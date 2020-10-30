@@ -9,8 +9,8 @@ type User struct {
 	ID       primitive.ObjectID `bson:"_id" json:"id"`
 	Username string             `json:"username" validate:"required"`
 	Email    string             `json:"email" validate:"email"`
-	Salt     string             `json:"salt"`
-	Hash     string             `json:"hash"`
+	Salt     string             `json:"-"`
+	Hash     string             `json:"-"`
 }
 
 // UserUpsertRequest struct

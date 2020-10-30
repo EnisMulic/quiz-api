@@ -10,8 +10,25 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// KeyQuiz a key
-type KeyQuiz struct{}
+// QuizzesResponse dto
+//
+// A list of users
+// swagger:response QuizzesResponse
+type QuizzesResponse struct {
+	// All users in the db
+	// in: body
+	Body []domain.Quiz
+}
+
+// QuizResponse dto
+//
+// A user
+// swagger:response QuizResponse
+type QuizResponse struct {
+	// A User in the db
+	// in: body
+	Body domain.Quiz
+}
 
 // Quizes struct
 type Quizes struct {
@@ -26,6 +43,9 @@ func NewQuiz(l *log.Logger, r *db.QuizRepository) *Quizes {
 
 // swagger:route GET /quiz quiz listQuiz
 // Returns a list of quizes
+//
+// responses:
+//	200: QuizzesResponse
 
 // GetQuizes HTTP Get Method
 func (q *Quizes) GetQuizes(rw http.ResponseWriter, r *http.Request) {
@@ -44,6 +64,9 @@ func (q *Quizes) GetQuizes(rw http.ResponseWriter, r *http.Request) {
 
 // swagger:route GET /quiz/{id} quiz singleQuiz
 // Returns a single quiz
+//
+// responses:
+//	200: QuizResponse
 
 // GetQuiz returns the quiz from the data store
 func (q *Quizes) GetQuiz(rw http.ResponseWriter, r *http.Request) {

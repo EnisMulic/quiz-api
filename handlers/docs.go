@@ -14,3 +14,8 @@
 //	swagger:meta
 
 package handlers
+
+// No content is returned by this API endpoint
+// swagger:response noContentResponse
+type noContentResponseWrapper struct {
+}
