@@ -80,11 +80,11 @@ func (q Quizes) MiddlewareValidateQuiz(next http.Handler) http.Handler {
 		err := domain.FromJSON(quiz, r.Body)
 		if err != nil {
 			q.l.Println("[ERROR] deserializing quiz", err)
-			http.Error(rw, "Error reading user", http.StatusBadRequest)
+			http.Error(rw, "Error reading quiz", http.StatusBadRequest)
 			return
 		}
 
-		// validate the user
+		// validate the quiz
 		err = domain.Validate(quiz)
 		if err != nil {
 			q.l.Println("[ERROR] validating quiz", err)
@@ -98,6 +98,38 @@ func (q Quizes) MiddlewareValidateQuiz(next http.Handler) http.Handler {
 
 		// add the product to the context
 		ctx := context.WithValue(r.Context(), KeyStruct{}, quiz)
+		r = r.WithContext(ctx)
+
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(rw, r)
+	})
+}
+
+// MiddlewareValidateQuestion for validation
+func (q Quizes) MiddlewareValidateQuestion(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		question := new(domain.Question)
+		err := domain.FromJSON(question, r.Body)
+		if err != nil {
+			q.l.Println("[ERROR] deserializing question", err)
+			http.Error(rw, "Error reading question", http.StatusBadRequest)
+			return
+		}
+
+		// validate the question
+		err = domain.Validate(question)
+		if err != nil {
+			q.l.Println("[ERROR] validating question", err)
+			http.Error(
+				rw,
+				fmt.Sprintf("Error validating question: %s", err),
+				http.StatusBadRequest,
+			)
+			return
+		}
+
+		// add the product to the context
+		ctx := context.WithValue(r.Context(), KeyStruct{}, question)
 		r = r.WithContext(ctx)
 
 		// Call the next handler, which can be another middleware in the chain, or the final handler.

@@ -89,6 +89,7 @@ func main() {
 	questionPostRouter := serverMux.Methods(http.MethodPost).Subrouter()
 	questionPostRouter.HandleFunc("/quiz/{id}/question", quizHandler.AddQuestion)
 	questionPostRouter.Use(handlers.IsAuthorized)
+	questionPostRouter.Use(quizHandler.MiddlewareValidateQuestion)
 
 	questionDeleteRouter := serverMux.Methods(http.MethodDelete).Subrouter()
 	questionDeleteRouter.HandleFunc("/quiz/{id}/question/{question_id}", quizHandler.DeleteQuestion)

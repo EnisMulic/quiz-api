@@ -15,7 +15,7 @@ const (
 // Question domain model
 type Question struct {
 	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
-	Text         string             `json:"text"`
-	Answers      []Answer           `json:"answers"`
-	QuestionType QuestionType       `json:"type"`
+	Text         string             `json:"text" validate:"required"`
+	Answers      []Answer           `json:"answers" validate:"required"`
+	QuestionType QuestionType       `json:"type" validate:"required"`
 }
