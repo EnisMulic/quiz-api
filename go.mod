@@ -15,6 +15,5 @@ require (
 	github.com/oleiade/reflections v1.0.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	go.mongodb.org/mongo-driver v1.4.2
-	golang.org/x/crypto v0.0.0-20190617133340-57b3e21c3d56
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
