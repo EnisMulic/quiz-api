@@ -35,8 +35,18 @@ func (a *Auth) Register(rw http.ResponseWriter, r *http.Request) {
 
 }
 
+// AuthResponse returns jwt if auth is successful
+//
+// swagger:response AuthResponse
+type AuthResponse struct {
+	Token string
+}
+
 // swagger:route POST /auth/login auth login
 // Login a user
+//
+// responses:
+//	200: AuthResponse
 
 // Login as a user
 func (a *Auth) Login(rw http.ResponseWriter, r *http.Request) {
@@ -45,9 +55,13 @@ func (a *Auth) Login(rw http.ResponseWriter, r *http.Request) {
 
 	jwt, err := a.r.Login(user)
 	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		http.Error(rw, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
-	rw.Write([]byte(`{"token":"` + jwt + `"}`))
+	response := AuthResponse{jwt}
+	err = domain.ToJSON(response, rw)
+	if err != nil {
+		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
+	}
 }

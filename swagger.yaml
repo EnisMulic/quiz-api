@@ -80,6 +80,9 @@ paths:
     post:
       description: Login a user
       operationId: login
+      responses:
+        "200":
+          $ref: '#/responses/AuthResponse'
       tags:
       - auth
   /auth/register:
@@ -173,6 +176,11 @@ paths:
       tags:
       - user
 responses:
+  AuthResponse:
+    description: AuthResponse returns jwt if auth is successful
+    headers:
+      Token:
+        type: string
   QuizResponse:
     description: |-
       QuizResponse dto
