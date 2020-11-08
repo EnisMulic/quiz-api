@@ -21,39 +21,15 @@ func NewFiles(s files.Storage, l hclog.Logger) *Files {
 	return &Files{store: s, log: l}
 }
 
-// UploadREST implements the http.Handler interface
-func (f *Files) UploadREST(rw http.ResponseWriter, r *http.Request) {
+// Upload implements the http.Handler interface
+func (f *Files) Upload(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 	fn := vars["filename"]
 
 	f.log.Info("Handle POST", "id", id, "filename", fn)
 
-	// no need to check for invalid id or filename as the mux router will not send requests
-	// here unless they have the correct parameters
 	f.saveFile(id, fn, rw, r.Body)
-}
-
-// UploadMultipart something
-func (f *Files) UploadMultipart(rw http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(128 * 1024)
-	if err != nil {
-		f.log.Error("Bad request", "error", err)
-		http.Error(rw, "Expected multipart form data", http.StatusBadRequest)
-		return
-	}
-
-	id := r.FormValue("id")
-	f.log.Info("Process form for id", "id", id)
-
-	ff, mh, err := r.FormFile("file")
-	if err != nil {
-		f.log.Error("Bad request", "error", err)
-		http.Error(rw, "Expected file", http.StatusBadRequest)
-		return
-	}
-
-	f.saveFile(r.FormValue("id"), mh.Filename, rw, ff)
 }
 
 func (f *Files) invalidURI(uri string, rw http.ResponseWriter) {

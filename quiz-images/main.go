@@ -47,7 +47,7 @@ func main() {
 	// upload files
 	postHandler := serverMux.Methods(http.MethodPost).Subrouter()
 	postHandler.HandleFunc("/images/{id}/{filename:[a-zA-Z]+\\.[a-z]{3,}}", fileHangler.UploadREST)
-	postHandler.HandleFunc("/", fileHangler.UploadMultipart)
+	postHandler.HandleFunc("/", fileHangler.Upload)
 
 	// get files
 	getHandler := serverMux.Methods(http.MethodGet).Subrouter()
