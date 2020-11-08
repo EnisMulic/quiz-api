@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/EnisMulic/quiz-api/quiz-images/files"
+	"github.com/EnisMulic/quiz-api/quiz-images/handlers"
 	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	hclog "github.com/hashicorp/go-hclog"
@@ -33,11 +35,26 @@ func main() {
 		os.Exit(1)
 	}
 
+	// create the handlers
+	fileHangler := handlers.NewFiles(stor, logger)
+
 	// create a new serve mux
 	serverMux := mux.NewRouter()
 
 	// CORS
 	corsHandler := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"*"}))
+
+	// upload files
+	postHandler := serverMux.Methods(http.MethodPost).Subrouter()
+	postHandler.HandleFunc("/images/{id}/{filename:[a-zA-Z]+\\.[a-z]{3,}}", fileHangler.UploadREST)
+	postHandler.HandleFunc("/", fileHangler.UploadMultipart)
+
+	// get files
+	getHandler := serverMux.Methods(http.MethodGet).Subrouter()
+	getHandler.Handle(
+		"/images/{id}/{filename:[a-zA-Z]+\\.[a-z]{3,}}",
+		http.StripPrefix("/images/", http.FileServer(http.Dir("./imagestore"))),
+	)
 
 	// create the server
 	server := &http.Server{
@@ -66,8 +83,8 @@ func main() {
 	log.Println("Got signal:", signal)
 
 	// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
-	ctx, err := context.WithTimeout(context.Background(), 30*time.Second)
-	if err != nil {
+	ctx, shutdownErr := context.WithTimeout(context.Background(), 30*time.Second)
+	if shutdownErr != nil {
 		log.Fatal(err)
 	}
 
