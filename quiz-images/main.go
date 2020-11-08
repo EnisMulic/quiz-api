@@ -25,6 +25,14 @@ func main() {
 	// create a logger
 	serverLogger := logger.StandardLogger(&hclog.StandardLoggerOptions{InferLevels: true})
 
+	// create the storage class, use local storage
+	// max filesize 5MB
+	stor, err := files.NewLocal("./imagestore", 1024*1000*5)
+	if err != nil {
+		logger.Error("Unable to create storage", "error", err)
+		os.Exit(1)
+	}
+
 	// create a new serve mux
 	serverMux := mux.NewRouter()
 
