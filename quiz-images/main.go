@@ -36,7 +36,7 @@ func main() {
 	}
 
 	// create the handlers
-	fileHangler := handlers.NewFiles(stor, logger)
+	fileHandler := handlers.NewFiles(stor, logger)
 
 	// create a new serve mux
 	serverMux := mux.NewRouter()
@@ -46,8 +46,8 @@ func main() {
 
 	// upload files
 	postHandler := serverMux.Methods(http.MethodPost).Subrouter()
-	postHandler.HandleFunc("/images/{id}/{filename:[a-zA-Z]+\\.[a-z]{3,}}", fileHangler.UploadREST)
-	postHandler.HandleFunc("/", fileHangler.Upload)
+	postHandler.HandleFunc("/images/{id}/{filename:[a-zA-Z]+\\.[a-z]{3,}}", fileHandler.Upload)
+	postHandler.HandleFunc("/", fileHandler.Upload)
 
 	// get files
 	getHandler := serverMux.Methods(http.MethodGet).Subrouter()
