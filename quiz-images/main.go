@@ -47,7 +47,6 @@ func main() {
 	// upload files
 	postHandler := serverMux.Methods(http.MethodPost).Subrouter()
 	postHandler.HandleFunc("/images/{id}/{filename:[a-zA-Z]+\\.[a-z]{3,}}", fileHandler.Upload)
-	postHandler.HandleFunc("/", fileHandler.Upload)
 
 	// get files
 	getHandler := serverMux.Methods(http.MethodGet).Subrouter()
@@ -55,6 +54,7 @@ func main() {
 		"/images/{id}/{filename:[a-zA-Z]+\\.[a-z]{3,}}",
 		http.StripPrefix("/images/", http.FileServer(http.Dir("./imagestore"))),
 	)
+	getHandler.Use(handlers.GzipMiddleware)
 
 	// create the server
 	server := &http.Server{

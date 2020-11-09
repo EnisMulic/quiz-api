@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -42,6 +43,7 @@ func (f *Files) saveFile(id, path string, rw http.ResponseWriter, r io.ReadClose
 	f.log.Info("Save file for quiz", "id", id, "path", path)
 
 	fp := filepath.Join(id, path)
+	fmt.Printf("%s", r)
 	err := f.store.Save(fp, r)
 	if err != nil {
 		f.log.Error("Unable to save file", "error", err)
