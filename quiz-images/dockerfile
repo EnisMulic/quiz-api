@@ -1,0 +1,11 @@
+FROM golang:alpine
+
+RUN mkdir /app 
+
+ADD . /app/
+WORKDIR /app 
+ADD ./imagestore ./imagestore
+
+RUN go build -o main .
+
+CMD ["./main"]
