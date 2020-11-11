@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/EnisMulic/quiz-api/db"
+	"github.com/EnisMulic/quiz-api/quiz-api/db"
 
-	"github.com/EnisMulic/quiz-api/handlers"
+	"github.com/EnisMulic/quiz-api/quiz-api/handlers"
 	"github.com/go-openapi/runtime/middleware"
 	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"

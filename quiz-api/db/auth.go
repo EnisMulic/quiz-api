@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/EnisMulic/quiz-api/domain"
+	"github.com/EnisMulic/quiz-api/quiz-api/domain"
 	"github.com/dgrijalva/jwt-go"
 )
 

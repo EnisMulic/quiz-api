@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/EnisMulic/quiz-api/domain"
+	"github.com/EnisMulic/quiz-api/quiz-api/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

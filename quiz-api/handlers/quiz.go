@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/EnisMulic/quiz-api/db"
-	"github.com/EnisMulic/quiz-api/domain"
+	"github.com/EnisMulic/quiz-api/quiz-api/db"
+	"github.com/EnisMulic/quiz-api/quiz-api/domain"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

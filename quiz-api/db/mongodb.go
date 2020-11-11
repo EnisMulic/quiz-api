@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/EnisMulic/quiz-api/domain"
+	"github.com/EnisMulic/quiz-api/quiz-api/domain"
 	"github.com/goonode/mogo"
 )
 
