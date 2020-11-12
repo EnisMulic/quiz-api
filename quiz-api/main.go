@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/EnisMulic/quiz-api/quiz-api/config"
 	"github.com/EnisMulic/quiz-api/quiz-api/db"
 
 	"github.com/EnisMulic/quiz-api/quiz-api/handlers"
@@ -22,7 +23,9 @@ func main() {
 	// setup mongodb connection
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, connErr := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+
+	dbHost := config.GetEnvVariable("QUIZ_DB")
+	client, connErr := mongo.Connect(ctx, options.Client().ApplyURI(dbHost))
 
 	defer func() {
 		if connErr = client.Disconnect(ctx); connErr != nil {
@@ -112,8 +115,9 @@ func main() {
 	corsHandler := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"*"}))
 
 	// create the server
+	addr := config.GetEnvVariable("API_ADDRESS")
 	server := &http.Server{
-		Addr:         ":8080",
+		Addr:         addr,
 		Handler:      corsHandler(serverMux),
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,

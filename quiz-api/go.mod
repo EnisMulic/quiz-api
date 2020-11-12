@@ -12,6 +12,7 @@ require (
 	github.com/goonode/mogo v0.0.0-20181028112152-10c38e9be609
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
+	github.com/joho/godotenv v1.3.0
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/oleiade/reflections v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.4.3

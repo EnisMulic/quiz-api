@@ -7,6 +7,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/EnisMulic/quiz-api/quiz-api/config"
+
 	"github.com/EnisMulic/quiz-api/quiz-api/domain"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -62,10 +64,10 @@ func doPasswordsMatch(passwordHash string, currPassword string, salt string) boo
 	return passwordHash == currPasswordHash
 }
 
-var secretKey = []byte("gosecretkey")
-
 // GenerateJWT generate a json web token
 func GenerateJWT(user domain.User) (string, error) {
+	secretKey := []byte(config.GetEnvVariable("SECRET_KEY"))
+
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)

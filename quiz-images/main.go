@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/EnisMulic/quiz-api/quiz-images/config"
 	"github.com/EnisMulic/quiz-api/quiz-images/files"
 	"github.com/EnisMulic/quiz-api/quiz-images/handlers"
 	gohandlers "github.com/gorilla/handlers"
@@ -57,8 +58,9 @@ func main() {
 	getHandler.Use(handlers.GzipMiddleware)
 
 	// create the server
+	addr := config.GetEnvVariable("API_ADDRESS")
 	server := &http.Server{
-		Addr:         ":8081",
+		Addr:         addr,
 		Handler:      corsHandler(serverMux),
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
