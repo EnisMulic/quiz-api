@@ -23,3 +23,9 @@ cat example.env > .env
 ```
 go run main.go
 ```
+
+### Test image upload
+
+```
+curl -X POST --data-binary '@go.png' localhost:8081/images/test/go.png
+```

@@ -14,6 +14,12 @@ git clone https://github.com/EnisMulic/quiz-api.git
 cd quiz-api/quiz-api
 ```
 
+### Create a `.env` file and set the environment variables
+
+```
+cat example.env > .env
+```
+
 ### Run the api
 
 ```
