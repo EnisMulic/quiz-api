@@ -13,10 +13,10 @@ import (
 
 	"github.com/EnisMulic/quiz-api/quiz-api/handlers"
 	"github.com/go-openapi/runtime/middleware"
-	gohandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -99,7 +99,7 @@ func main() {
 	questionDeleteRouter.Use(handlers.IsAuthorized)
 
 	// authentication router
-	authRouter := serverMux.Methods(http.MethodPost).Subrouter()
+	authRouter := serverMux.Methods(http.MethodPost, http.MethodOptions).Subrouter()
 	authRouter.HandleFunc("/auth/register", authHandler.Register)
 	authRouter.HandleFunc("/auth/login", authHandler.Login)
 
@@ -112,13 +112,19 @@ func main() {
 	docsRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	// CORS
-	corsHandler := gohandlers.CORS(gohandlers.AllowedOrigins([]string{"*"}))
+	cors := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowCredentials: true,
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Content-Type"},
+	})
+
 
 	// create the server
 	addr := config.GetEnvVariable("API_ADDRESS")
 	server := &http.Server{
 		Addr:         addr,
-		Handler:      corsHandler(serverMux),
+		Handler:      cors.Handler(serverMux),
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,

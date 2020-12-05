@@ -15,5 +15,6 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/oleiade/reflections v1.0.0 // indirect
+	github.com/rs/cors v1.7.0
 	go.mongodb.org/mongo-driver v1.4.3
 )

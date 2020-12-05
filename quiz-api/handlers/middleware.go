@@ -14,6 +14,7 @@ var secretKey = []byte("gosecretkey")
 // IsAuthorized checks if user is authorized
 func IsAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Add("Content-Type", "application/json")
 
 		if r.Header["Token"] != nil {
 
